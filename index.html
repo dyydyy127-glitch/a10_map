@@ -1,0 +1,1491 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+<title>石家庄二中实验学校 · 26届 A10班 · 毕业蹭饭地图</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Noto+Sans+SC:wght@300;400;500;700&display=swap" rel="stylesheet" />
+<style>
+:root{
+  --bg:#04070f;
+  --bg2:#070c1a;
+  --cyan:#22d3ee;
+  --cyan-soft:#7be8ff;
+  --teal:#14f1d0;
+  --violet:#8b5cf6;
+  --blue:#3b82f6;
+  --ink:#e8f2ff;
+  --muted:#8aa2c4;
+  --glass:rgba(13,22,42,.62);
+  --line:rgba(34,211,238,.18);
+  --line-strong:rgba(34,211,238,.45);
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{height:100%}
+body{
+  background:radial-gradient(120% 90% at 50% -10%, #0b1630 0%, var(--bg2) 42%, var(--bg) 100%);
+  color:var(--ink);
+  font-family:"Noto Sans SC","PingFang SC","Microsoft YaHei",system-ui,sans-serif;
+  overflow-x:hidden;
+}
+::selection{background:rgba(34,211,238,.3)}
+
+/* ---------- background layers ---------- */
+#bg,#aurora,#gridline{
+  position:fixed; inset:0; pointer-events:none;
+  transition:filter .6s ease;
+}
+#bg{z-index:0}
+#aurora{z-index:0;
+  background:
+    radial-gradient(38% 30% at 78% 18%, rgba(139,92,246,.16), transparent 70%),
+    radial-gradient(42% 34% at 15% 30%, rgba(34,211,238,.14), transparent 70%),
+    radial-gradient(50% 40% at 55% 85%, rgba(59,130,246,.12), transparent 70%);
+  filter:blur(2px);
+  animation:aurora 16s ease-in-out infinite alternate;
+}
+@keyframes aurora{
+  0%{opacity:.7; transform:translate3d(0,0,0) scale(1)}
+  100%{opacity:1; transform:translate3d(2%, -1%,0) scale(1.06)}
+}
+#gridline{z-index:1; opacity:.5;
+  background-image:
+    linear-gradient(rgba(34,211,238,.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(34,211,238,.05) 1px, transparent 1px);
+  background-size:46px 46px;
+  mask-image:radial-gradient(90% 80% at 50% 45%, #000 0%, transparent 78%);
+  -webkit-mask-image:radial-gradient(90% 80% at 50% 45%, #000 0%, transparent 78%);
+}
+body.focused #bg, body.focused #aurora, body.focused #gridline{filter:blur(14px) brightness(.75)}
+
+/* ---------- header ---------- */
+header{
+  position:fixed; top:0; left:0; right:0; z-index:30;
+  display:flex; align-items:center; justify-content:space-between;
+  padding:16px 26px;
+  transition:filter .6s ease, opacity .6s ease;
+}
+body.focused header{filter:blur(10px); opacity:.55}
+.brand{display:flex; align-items:center; gap:14px}
+.logo{
+  width:42px;height:42px;border-radius:12px;
+  display:grid;place-items:center;
+  background:linear-gradient(135deg, rgba(34,211,238,.25), rgba(139,92,246,.25));
+  border:1px solid var(--line-strong);
+  box-shadow:0 0 22px rgba(34,211,238,.35), inset 0 0 14px rgba(34,211,238,.18);
+  font-size:20px;
+}
+.title h1{
+  font-family:"Orbitron","Noto Sans SC",sans-serif;
+  font-size:20px; letter-spacing:2px; font-weight:700;
+  background:linear-gradient(90deg,#eaf6ff,#7be8ff 55%,#c4b5fd);
+  -webkit-background-clip:text; background-clip:text; color:transparent;
+}
+.title p{font-size:12px; color:var(--muted); letter-spacing:3px; margin-top:2px}
+.topnav{display:flex; gap:12px; align-items:center}
+.navbtn{
+  cursor:pointer; border:1px solid var(--line); color:var(--ink);
+  background:rgba(13,22,42,.5); backdrop-filter:blur(8px);
+  padding:9px 16px; border-radius:999px; font-size:13px; letter-spacing:1px;
+  transition:.25s;
+}
+.navbtn:hover{border-color:var(--cyan); color:var(--cyan-soft); box-shadow:0 0 18px rgba(34,211,238,.35)}
+.navbtn.primary{
+  background:linear-gradient(90deg, rgba(34,211,238,.2), rgba(139,92,246,.2));
+  border-color:var(--line-strong); color:var(--cyan-soft);
+}
+
+/* ---------- stage ---------- */
+#stage{position:fixed; inset:0; z-index:10}
+#glwrap{position:absolute; inset:0}
+#scene{position:absolute; inset:0; width:100%; height:100%; display:block; cursor:grab}
+#scene:active{cursor:grabbing}
+#css2d{position:absolute; inset:0; overflow:hidden; pointer-events:none}
+
+#hint{
+  position:absolute; left:50%; bottom:26px; transform:translateX(-50%); z-index:14;
+  font-size:12.5px; letter-spacing:1.5px; color:var(--muted);
+  padding:9px 18px; border:1px solid var(--line); border-radius:999px;
+  background:rgba(8,14,28,.5); backdrop-filter:blur(6px);
+  transition:opacity .5s;
+}
+#hint kbd{color:var(--cyan-soft)}
+
+/* ---------- province panel ---------- */
+#panel{
+  position:absolute; top:88px; right:24px; z-index:20;
+  width:330px; max-height:calc(100vh - 120px);
+  display:flex; flex-direction:column;
+  border-radius:20px; overflow:hidden;
+  background:var(--glass); backdrop-filter:blur(18px);
+  border:1px solid var(--line-strong);
+  box-shadow:0 18px 60px rgba(0,0,0,.5), 0 0 40px rgba(34,211,238,.12);
+  opacity:0; transform:translateX(40px); pointer-events:none;
+  transition:opacity .45s ease, transform .45s ease;
+}
+#panel.show{opacity:1; transform:translateX(0); pointer-events:auto}
+#panel .p-head{
+  padding:20px 22px 16px;
+  background:linear-gradient(135deg, rgba(34,211,238,.14), rgba(139,92,246,.12));
+  border-bottom:1px solid var(--line);
+}
+#panel .p-head .tag{font-size:11px; letter-spacing:2px; color:var(--cyan-soft); text-transform:uppercase}
+#panel .p-head h2{font-size:24px; margin:6px 0 4px; font-weight:700}
+#panel .p-head .sub{font-size:12px; color:var(--muted)}
+#panel .p-list{overflow-y:auto; padding:12px 14px 16px; flex:1}
+#panel .p-list::-webkit-scrollbar{width:6px}
+#panel .p-list::-webkit-scrollbar-thumb{background:rgba(34,211,238,.3); border-radius:3px}
+.stu{
+  width:100%; text-align:left; cursor:pointer;
+  display:flex; align-items:center; gap:12px;
+  padding:11px 12px; margin-bottom:8px;
+  border-radius:14px; border:1px solid rgba(34,211,238,.14);
+  background:rgba(255,255,255,.03);
+  transition:.22s;
+}
+.stu:hover{transform:translateX(4px); border-color:var(--cyan); background:rgba(34,211,238,.08); box-shadow:0 0 18px rgba(34,211,238,.22)}
+.stu .av{
+  flex:0 0 auto; width:38px; height:38px; border-radius:11px;
+  display:grid; place-items:center; font-weight:700; font-size:15px;
+  background:linear-gradient(135deg, rgba(34,211,238,.35), rgba(139,92,246,.35));
+  color:#dff6ff; border:1px solid var(--line-strong);
+}
+.stu .nm{font-size:14.5px; font-weight:600}
+.stu .uni{font-size:12px; color:var(--muted); margin-top:2px}
+.stu .go{margin-left:auto; color:var(--cyan-soft); font-size:16px}
+#panel .p-foot{padding:12px 18px; border-top:1px solid var(--line)}
+.backbtn{
+  cursor:pointer; width:100%; text-align:center;
+  padding:10px; border-radius:12px; font-size:13px; letter-spacing:1px;
+  color:var(--ink); background:rgba(255,255,255,.05); border:1px solid var(--line);
+  transition:.22s;
+}
+.backbtn:hover{border-color:var(--cyan); color:var(--cyan-soft); box-shadow:0 0 16px rgba(34,211,238,.3)}
+
+/* ---------- tooltip ---------- */
+#tooltip{
+  position:fixed; z-index:40; pointer-events:none; display:none;
+  padding:8px 13px; border-radius:10px; font-size:12.5px; letter-spacing:.5px;
+  color:var(--ink); background:rgba(8,15,30,.92); border:1px solid var(--line-strong);
+  box-shadow:0 8px 26px rgba(0,0,0,.5), 0 0 16px rgba(34,211,238,.25);
+}
+#tooltip b{color:var(--cyan-soft)}
+
+/* ---------- toast ---------- */
+#toast{
+  position:fixed; left:50%; top:78px; transform:translate(-50%,-16px); z-index:50;
+  padding:10px 20px; border-radius:12px; font-size:13px;
+  color:#ffe9c7; background:rgba(40,30,10,.9); border:1px solid rgba(255,190,90,.4);
+  opacity:0; pointer-events:none; transition:.3s;
+}
+#toast.show{opacity:1; transform:translate(-50%,0)}
+
+/* ---------- markers ---------- */
+.marker-outer{position:absolute; left:0; top:0; width:0; height:0; overflow:visible; pointer-events:none; z-index:3}
+.marker-label{
+  position:absolute; left:0; top:0;
+  pointer-events:auto; cursor:pointer; white-space:nowrap;
+  transform:translate(-50%,-50%);
+  padding:7px 12px; border-radius:12px;
+  border:1px solid rgba(34,211,238,.35);
+  background:linear-gradient(135deg, rgba(9,18,36,.94), rgba(14,28,52,.94));
+  box-shadow:0 6px 22px rgba(0,0,0,.5), 0 0 16px rgba(34,211,238,.22);
+  transition:border-color .2s, box-shadow .2s, background .2s;
+}
+.marker-label .nm{font-size:13px; font-weight:700; color:#eaf6ff; letter-spacing:.5px}
+.marker-label .uni{font-size:10.5px; color:var(--muted); margin-top:1px; letter-spacing:.5px}
+.marker-label:hover{border-color:var(--cyan); background:linear-gradient(135deg, rgba(14,40,56,.96), rgba(24,38,72,.96)); box-shadow:0 0 26px rgba(34,211,238,.6)}
+.marker-dot{pointer-events:none}
+
+/* ---------- messages section ---------- */
+#messages{
+  position:relative; z-index:60;
+  margin-top:100vh;
+  min-height:100vh;
+  padding:110px 6vw 80px;
+  background:linear-gradient(180deg, rgba(4,7,15,.2) 0%, rgba(4,7,15,.92) 18%, #04070f 100%);
+  backdrop-filter:blur(0px);
+}
+#messages::before{
+  content:""; position:absolute; inset:0; pointer-events:none;
+  background:radial-gradient(60% 40% at 50% 0%, rgba(34,211,238,.1), transparent 65%);
+}
+.sec-head{text-align:center; margin-bottom:38px; position:relative}
+.sec-head .en{font-family:"Orbitron",sans-serif; letter-spacing:4px; font-size:12px; color:var(--cyan-soft); margin-bottom:8px}
+.sec-head h2{font-size:clamp(26px,4vw,40px); font-weight:700;
+  background:linear-gradient(90deg,#eaf6ff,#7be8ff,#c4b5fd); -webkit-background-clip:text; background-clip:text; color:transparent}
+.sec-head p{color:var(--muted); margin-top:10px; font-size:14px; letter-spacing:1px}
+
+.msg-wrap{display:grid; grid-template-columns:360px 1fr; gap:26px; max-width:1180px; margin:0 auto; position:relative}
+.msg-form{
+  padding:24px; border-radius:20px; height:fit-content; position:sticky; top:100px;
+  background:var(--glass); border:1px solid var(--line-strong); backdrop-filter:blur(16px);
+  box-shadow:0 16px 50px rgba(0,0,0,.45);
+}
+.msg-form h3{font-size:17px; margin-bottom:16px; display:flex; align-items:center; gap:8px}
+.msg-form label{display:block; font-size:12.5px; color:var(--muted); margin:14px 0 7px; letter-spacing:1px}
+.msg-form input,.msg-form textarea{
+  width:100%; padding:12px 14px; border-radius:12px;
+  color:var(--ink); background:rgba(3,8,18,.6); border:1px solid var(--line);
+  font-family:inherit; font-size:14px; outline:none; transition:.2s; resize:none;
+}
+.msg-form input:focus,.msg-form textarea:focus{border-color:var(--cyan); box-shadow:0 0 0 3px rgba(34,211,238,.14)}
+.msg-form textarea{height:120px; line-height:1.7}
+.submit{
+  cursor:pointer; width:100%; margin-top:18px; padding:13px; border:none; border-radius:12px;
+  font-size:15px; font-weight:600; letter-spacing:2px; color:#03121a;
+  background:linear-gradient(90deg, var(--cyan), var(--teal));
+  box-shadow:0 8px 26px rgba(34,211,238,.35);
+  transition:.22s;
+}
+.submit:hover{transform:translateY(-2px); box-shadow:0 12px 34px rgba(34,211,238,.5)}
+.submit:active{transform:translateY(0)}
+
+.msg-wall{display:grid; grid-template-columns:repeat(auto-fill,minmax(270px,1fr)); gap:16px; align-content:start}
+.msg-empty{grid-column:1/-1; text-align:center; padding:56px 20px; border:1px dashed var(--line); border-radius:18px; color:var(--muted); font-size:14px; letter-spacing:1px}
+.msg-card{
+  position:relative; padding:18px 18px 16px; border-radius:18px;
+  background:rgba(13,22,42,.55); border:1px solid var(--line); backdrop-filter:blur(10px);
+  animation:pop .4s ease both;
+}
+@keyframes pop{from{opacity:0; transform:translateY(12px) scale(.97)} to{opacity:1; transform:none}}
+.msg-card .head{display:flex; align-items:center; gap:10px; margin-bottom:12px}
+.msg-card .av{
+  width:34px;height:34px;border-radius:10px; display:grid; place-items:center; font-weight:700;
+  background:linear-gradient(135deg, rgba(34,211,238,.4), rgba(139,92,246,.4)); border:1px solid var(--line-strong); color:#e6f7ff;
+}
+.msg-card .who{font-weight:600; font-size:14px}
+.msg-card .when{font-size:11px; color:var(--muted)}
+.msg-card .txt{font-size:14px; line-height:1.8; color:#d6e6f8; white-space:pre-wrap}
+.msg-card .del{
+  position:absolute; top:12px; right:12px; cursor:pointer; color:var(--muted);
+  border:none; background:none; font-size:14px; opacity:0; transition:.2s;
+}
+.msg-card:hover .del{opacity:1}
+.msg-card .del:hover{color:#ff7b8a}
+
+/* ---------- modal ---------- */
+#modal{
+  position:fixed; inset:0; z-index:80; display:none; place-items:center; padding:24px;
+  background:rgba(3,6,14,.6); backdrop-filter:blur(10px);
+}
+#modal.show{display:grid}
+.modal-box{
+  width:min(520px,94vw); max-height:88vh; overflow-y:auto;
+  border-radius:22px; padding:30px 30px 26px;
+  background:linear-gradient(160deg, rgba(14,26,50,.96), rgba(8,14,28,.96));
+  border:1px solid var(--line-strong);
+  box-shadow:0 30px 90px rgba(0,0,0,.6), 0 0 50px rgba(34,211,238,.16);
+  animation:pop .35s ease both;
+}
+.modal-box::-webkit-scrollbar{width:6px}
+.modal-box::-webkit-scrollbar-thumb{background:rgba(34,211,238,.3); border-radius:3px}
+.modal-top{display:flex; align-items:center; gap:14px}
+.modal-av{
+  width:52px;height:52px;border-radius:14px; display:grid; place-items:center;
+  font-size:22px; font-weight:700; color:#eaf6ff;
+  background:linear-gradient(135deg, rgba(34,211,238,.45), rgba(139,92,246,.45));
+  border:1px solid var(--line-strong); box-shadow:0 0 22px rgba(34,211,238,.3);
+}
+.modal-top .nm{font-size:20px; font-weight:700}
+.modal-top .uni{font-size:14px; color:var(--cyan-soft); margin-top:3px}
+.modal-top .city{font-size:12px; color:var(--muted); margin-top:4px}
+.modal-close{margin-left:auto; cursor:pointer; width:34px;height:34px;border-radius:10px; border:1px solid var(--line); background:rgba(255,255,255,.04); color:var(--muted); font-size:16px; transition:.2s}
+.modal-close:hover{color:#fff; border-color:var(--cyan); box-shadow:0 0 14px rgba(34,211,238,.4)}
+.rate{margin:16px 0 4px; font-size:12px; color:var(--muted); letter-spacing:1px}
+.rate .stars{color:#ffd76a; font-size:14px; letter-spacing:2px; margin-left:6px}
+.ill-row{display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-top:18px}
+.ill{position:relative; border-radius:16px; overflow:hidden; border:1px solid var(--line); height:132px; background:#0a1428}
+.ill .ill-bg{position:absolute; inset:0; display:flex; align-items:center; justify-content:center; z-index:0}
+.ill .ill-emoji{font-size:48px; line-height:1; filter:drop-shadow(0 6px 14px rgba(0,0,0,.55)); animation:floaty 3.2s ease-in-out infinite}
+.ill .skyline{position:absolute; left:0; right:0; bottom:0; width:100%; height:60px; opacity:.55; z-index:1}
+.ill .ill-photo{position:absolute; inset:0; width:100%; height:100%; object-fit:cover; z-index:2}
+.ill .ill-cap{position:absolute; left:0; right:0; bottom:0; padding:28px 12px 10px; background:linear-gradient(transparent, rgba(0,0,0,.82)); font-size:12px; color:#eaf6ff; z-index:3}
+.ill .ill-cap .tag{display:block; font-size:10px; color:#9fd4e8; letter-spacing:1.5px; margin-bottom:2px}
+.ill .ill-cap b{font-size:15px}
+@keyframes floaty{0%,100%{transform:translateY(0)}50%{transform:translateY(-7px)}}
+@media (max-width:520px){ .ill-row{grid-template-columns:1fr} }
+.modal-sec{margin-top:20px}
+.modal-sec h4{display:flex; align-items:center; gap:8px; font-size:13px; letter-spacing:2px; color:var(--cyan-soft); margin-bottom:10px}
+.modal-sec h4::before{content:""; width:16px; height:2px; background:linear-gradient(90deg,var(--cyan),transparent)}
+.modal-sec p{font-size:14px; line-height:1.9; color:#cfe2f6}
+.food-card{
+  margin-top:14px; padding:16px; border-radius:16px;
+  background:linear-gradient(135deg, rgba(34,211,238,.1), rgba(139,92,246,.1));
+  border:1px solid var(--line);
+}
+.food-card .fname{font-size:15px; font-weight:700; color:#ffe9c7}
+.food-card .fname span{font-size:18px; margin-right:6px}
+.food-card p{font-size:13.5px; line-height:1.8; color:#e4d9c2; margin-top:6px}
+
+/* ---------- loading ---------- */
+#loading{
+  position:fixed; inset:0; z-index:100; display:grid; place-items:center;
+  background:radial-gradient(100% 100% at 50% 40%, #0a1428, #04070f);
+  transition:opacity .6s;
+}
+#loading.hide{opacity:0; pointer-events:none}
+.load-box{text-align:center}
+.spinner{
+  width:60px;height:60px;margin:0 auto 20px;border-radius:50%;
+  border:3px solid rgba(34,211,238,.15); border-top-color:var(--cyan);
+  animation:spin 1s linear infinite; box-shadow:0 0 30px rgba(34,211,238,.25);
+}
+@keyframes spin{to{transform:rotate(360deg)}}
+.load-box .t{font-family:"Orbitron",sans-serif; letter-spacing:3px; color:var(--cyan-soft); font-size:14px}
+.load-box .s{font-size:12px; color:var(--muted); margin-top:8px; letter-spacing:2px}
+
+@media (max-width:820px){
+  #panel{right:10px; left:10px; width:auto; top:auto; bottom:12px; max-height:48vh}
+  .msg-wrap{grid-template-columns:1fr}
+  .msg-form{position:static}
+  .title h1{font-size:16px}
+  .topnav .navbtn span{display:none}
+}
+</style>
+</head>
+<body>
+
+<canvas id="bg"></canvas>
+<div id="aurora"></div>
+<div id="gridline"></div>
+
+<header>
+  <div class="brand">
+    <div class="logo">🎓</div>
+    <div class="title">
+      <h1>CLASS A10 · 2026</h1>
+      <p>石家庄二中实验学校 · 毕业蹭饭地图</p>
+    </div>
+  </div>
+  <div class="topnav">
+    <button class="navbtn" id="homeBtn">🗺️ <span>全国地图</span></button>
+    <button class="navbtn primary" id="msgNavBtn">💬 <span>同学寄语</span></button>
+  </div>
+</header>
+
+<div id="stage">
+  <div id="glwrap">
+    <canvas id="scene"></canvas>
+    <div id="css2d"></div>
+  </div>
+
+  <div id="panel">
+    <div class="p-head">
+      <div class="tag">▍CLASSMATES IN THIS PROVINCE</div>
+      <h2 id="pName">河北省</h2>
+      <div class="sub" id="pSub">7 位同学 · 点击名字查看学校与美食</div>
+    </div>
+    <div class="p-list" id="pList"></div>
+    <div class="p-foot"><button class="backbtn" id="backBtn">↺ 返回全国地图</button></div>
+  </div>
+
+  <div id="hint"><kbd>拖拽</kbd> 移动 · <kbd>滚轮</kbd> 缩放 · <kbd>右键</kbd> 旋转 · <kbd>点击</kbd> 省份查看同学</div>
+</div>
+
+<div id="messages">
+  <div class="sec-head">
+    <div class="en">— MESSAGE WALL —</div>
+    <h2>同学寄语墙</h2>
+    <p>把想对大家说的话留在这里，愿我们各自奔赴山海，顶峰相见</p>
+  </div>
+  <div class="msg-wrap">
+    <div class="msg-form">
+      <h3>✍️ 写下你的寄语</h3>
+      <label>你的名字</label>
+      <input id="mName" list="nameList" placeholder="例如：范漪曼" maxlength="20" />
+      <datalist id="nameList"></datalist>
+      <label>寄语内容</label>
+      <textarea id="mText" placeholder="祝大家前程似锦，常回来蹭饭！" maxlength="240"></textarea>
+      <button class="submit" id="mSubmit">发布寄语</button>
+      <p style="font-size:11px;color:var(--muted);margin-top:12px;line-height:1.7">寄语保存在本机浏览器（localStorage），刷新不会丢失。</p>
+    </div>
+    <div class="msg-wall" id="msgWall"></div>
+  </div>
+</div>
+
+<div id="modal">
+  <div class="modal-box">
+    <div class="modal-top">
+      <div class="modal-av" id="mAv">范</div>
+      <div>
+        <div class="nm" id="mName2">范漪曼</div>
+        <div class="uni" id="mUni">石家庄铁道大学</div>
+        <div class="city" id="mCity">河北省 · 石家庄</div>
+      </div>
+      <button class="modal-close" id="mClose">✕</button>
+    </div>
+    <div class="rate">蹭饭指数 <span class="stars" id="mStars"></span></div>
+    <div class="ill-row" id="mIll"></div>
+    <div class="modal-sec">
+      <h4>学校与城市</h4>
+      <p id="mIntro"></p>
+    </div>
+    <div class="modal-sec">
+      <h4>当地必吃</h4>
+      <div class="food-card">
+        <div class="fname"><span>🍜</span><span id="mFood"></span></div>
+        <p id="mFoodDesc"></p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="tooltip"></div>
+<div id="toast"></div>
+
+<div id="loading">
+  <div class="load-box">
+    <div class="spinner"></div>
+    <div class="t">LOADING MAP…</div>
+    <div class="s">正在加载中国地图数据</div>
+  </div>
+</div>
+
+<script>
+/* ===== 星空背景 ===== */
+(function(){
+  var cv = document.getElementById('bg');
+  var ctx = cv.getContext('2d');
+  var stars = [], meteors = [];
+  function resize(){
+    cv.width = innerWidth; cv.height = innerHeight;
+    stars = [];
+    var n = Math.floor(innerWidth*innerHeight/5500);
+    for(var i=0;i<n;i++){
+      stars.push({x:Math.random()*cv.width, y:Math.random()*cv.height,
+        r:Math.random()*1.4+0.3, a:Math.random()*Math.PI*2, s:0.3+Math.random()*1.4});
+    }
+  }
+  resize(); addEventListener('resize', resize);
+  function tick(){
+    ctx.clearRect(0,0,cv.width,cv.height);
+    for(var i=0;i<stars.length;i++){
+      var st = stars[i];
+      st.a += 0.01*st.s;
+      var al = 0.35 + 0.65*Math.abs(Math.sin(st.a));
+      ctx.beginPath();
+      ctx.fillStyle = 'rgba(' + (Math.random()<0.15?'190,220,255':'210,235,255') + ',' + al + ')';
+      ctx.arc(st.x, st.y, st.r, 0, Math.PI*2);
+      ctx.fill();
+    }
+    if(Math.random()<0.006 && meteors.length<2){
+      meteors.push({x:Math.random()*cv.width*0.7+cv.width*0.2, y:Math.random()*cv.height*0.3,
+        vx:-(5+Math.random()*4), vy:2+Math.random()*2, life:1});
+    }
+    for(var j=meteors.length-1;j>=0;j--){
+      var m = meteors[j];
+      m.x += m.vx; m.y += m.vy; m.life -= 0.014;
+      ctx.beginPath();
+      var g = ctx.createLinearGradient(m.x, m.y, m.x - m.vx*9, m.y - m.vy*9);
+      g.addColorStop(0,'rgba(160,240,255,'+Math.max(0,m.life)+')');
+      g.addColorStop(1,'rgba(160,240,255,0)');
+      ctx.strokeStyle = g; ctx.lineWidth = 1.6;
+      ctx.moveTo(m.x, m.y); ctx.lineTo(m.x - m.vx*9, m.y - m.vy*9); ctx.stroke();
+      if(m.life<=0) meteors.splice(j,1);
+    }
+    requestAnimationFrame(tick);
+  }
+  tick();
+})();
+</script>
+
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://registry.npmmirror.com/three/0.160.0/files/build/three.module.js",
+    "three/addons/": "https://registry.npmmirror.com/three/0.160.0/files/examples/jsm/"
+  }
+}
+</script>
+
+<script type="module">
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { CSS2DRenderer, CSS2DObject } from 'three/addons/renderers/CSS2DRenderer.js';
+
+/* ================= 数据 ================= */
+const UNIS = {
+  '石家庄铁道大学': { city:'石家庄', pos:[114.51,38.04],
+    intro:'前身为1950年组建的铁道兵工程学院，是全国重点大学，土木、交通与机械工程特色鲜明，被誉为中国轨道交通工程师的摇篮。',
+    food:'正定八大碗', foodDesc:'石家庄正定传统宴席名菜，以蒸、炖为主，八大碗荤素相搭、软烂醇香，是逢年过节的经典年味。' },
+  '河北科技大学': { city:'石家庄', pos:[114.51,38.04],
+    intro:'河北省属重点骨干大学，工程、化工、环境等应用学科实力扎实，主校区位于石家庄。',
+    food:'藁城宫面', foodDesc:'石家庄藁城特产，面细如发丝且中空，久煮不烂，配鸡汤或清汤皆宜，曾为宫廷贡品。' },
+  '河北科技职业技术大学': { city:'邢台', pos:[114.50,37.07],
+    intro:'以工程技术为特色的应用型职业本科大学，深化产教融合、培养高素质技术技能人才，位于河北邢台。',
+    food:'广宗薄饼', foodDesc:'邢台广宗县传统面食，饼薄如纸、柔韧透亮，可卷菜佐汤食用，是当地的招牌味道。' },
+  '河北大学': { city:'保定', pos:[115.46,38.87],
+    intro:'河北省重点综合性大学，文理并重，校史可追溯至1921年，主校区坐落于历史文化名城保定。',
+    food:'保定驴肉火烧', foodDesc:'保定经典小吃，现打火烧外酥内软，夹入卤制驴肉，配一勺焖子与青椒，鲜香不腻。' },
+  '河北中医药大学': { city:'石家庄', pos:[114.51,38.04],
+    intro:'河北省中医药人才培养与科研基地，中医学、中药学等学科特色突出。',
+    food:'缸炉烧饼', foodDesc:'以缸炉烘烤的石家庄传统面食，饼皮酥脆、芝麻飘香，趁热吃最香。' },
+  '河北经贸大学': { city:'石家庄', pos:[114.51,38.04],
+    intro:'河北省重点建设的财经类大学，经、管、法、文多学科协调发展。',
+    food:'金毛狮子鱼', foodDesc:'冀菜传统名菜，鱼经精细刀工炸成金黄蓬松的“狮子”造型，酸甜适口。' },
+  '河北农业大学': { city:'保定', pos:[115.46,38.87],
+    intro:'创建于1902年，是中国建校最早的农业院校之一，农、林、畜牧等学科底蕴深厚。',
+    food:'漕河驴肉火烧', foodDesc:'热火烧夹冷驴肉，是保定人最日常的满足，皮脆肉香、回味悠长。' },
+  '兰州大学': { city:'兰州', pos:[103.83,36.06],
+    intro:'教育部直属全国重点大学、985工程高校，化学、草学等学科享誉全国，位于黄河穿城而过的金城兰州。',
+    food:'兰州牛肉面', foodDesc:'一清二白三红四绿五黄，毛细到二细任选，汤清味浓，是兰州人一天的开场。' },
+  '青海大学': { city:'西宁', pos:[101.78,36.62],
+    intro:'青海省唯一的211工程重点大学，生态学、高原医学等特色鲜明，坐落于夏都西宁。',
+    food:'青海酿皮', foodDesc:'西宁街头人气小吃，酿皮筋道、浇上香醋辣油与韭菜末，酸辣爽口。' },
+  '网络空间部队信息工程大学': { city:'郑州', pos:[113.63,34.75],
+    intro:'军队重点建设院校，聚焦网络空间安全与信息技术，为国防输送高层次信息化人才，本部位于郑州。',
+    food:'郑州烩面', foodDesc:'汤白似乳、面宽筋道，配羊肉、粉丝与木耳，是郑州人最惦记的一碗面。' },
+  '重庆理工大学': { city:'重庆', pos:[106.55,29.56],
+    intro:'重庆市重点建设高校，车辆工程、机械等学科与重庆汽车产业深度联动，坐落于山城重庆。',
+    food:'重庆火锅', foodDesc:'牛油红汤翻滚、麻辣鲜香，毛肚鸭肠七上八下，是山城最热烈的烟火气。' },
+  '中南林业科技大学': { city:'长沙', pos:[112.94,28.23],
+    intro:'湖南省与国家林业和草原局共建高校，林学、生态学等特色突出，位于星城长沙。',
+    food:'长沙臭豆腐', foodDesc:'外焦里嫩、闻着臭吃着香，浇上蒜蓉辣酱与萝卜干，是长沙街头最出圈的味道。' },
+  '湘潭大学': { city:'湘潭', pos:[112.94,27.83],
+    intro:'全国重点大学、双一流建设高校，数学等基础学科实力强劲，坐落于伟人故里湘潭。',
+    food:'毛氏红烧肉', foodDesc:'源自韶山的湘味名菜，慢火煨制、色泽红亮，肥而不腻、入口即化。' },
+  '湖南工业大学': { city:'株洲', pos:[113.13,27.83],
+    intro:'以包装设计、材料等学科见长的省属重点大学，位于动力之都株洲。',
+    food:'攸县香干', foodDesc:'株洲攸县特产豆干，卤香浓郁、紧实有嚼劲，炒肉或凉拌皆宜。' },
+  '长沙理工大学': { city:'长沙', pos:[112.94,28.23],
+    intro:'交通运输、电力、水利等工科特色鲜明的省属重点大学，位于长沙。',
+    food:'糖油粑粑', foodDesc:'糯米团子裹上红糖油汁，外脆内糯、甜而不腻，是老长沙的温柔。' },
+  '中山大学': { city:'广州', pos:[113.26,23.13],
+    intro:'教育部直属综合性全国重点大学、985高校，文理医管兼备，坐落于花城广州。',
+    food:'广式早茶·虾饺', foodDesc:'皮薄透亮、虾仁饱满，一盅两件叹早茶，是广州最悠闲的早晨。' },
+  '广东外语外贸大学': { city:'广州', pos:[113.26,23.13],
+    intro:'以外国语言文学与涉外经贸见长的省属重点大学，被誉为华南地区外语外贸人才的摇篮。',
+    food:'广式烧鹅', foodDesc:'皮脆肉嫩、汁水丰盈，蘸酸梅酱一绝，是粤式烧腊的招牌。' },
+  '黑龙江大学': { city:'哈尔滨', pos:[126.53,45.80],
+    intro:'黑龙江省属综合性重点大学，俄语等学科全国领先，坐落于冰城哈尔滨。',
+    food:'锅包肉', foodDesc:'源自哈尔滨的酸甜口名菜，外酥里嫩、色泽金黄，东北菜的头牌。' },
+  '沈阳航空航天大学': { city:'沈阳', pos:[123.43,41.80],
+    intro:'以航空航天为特色的省属高校，为航空工业培养了大批人才，位于沈阳。',
+    food:'沈阳鸡架', foodDesc:'沈阳人的深夜食堂，拌、烤、炸皆可，啃的就是那份嗦骨头的快乐。' },
+  '中国人民公安大学': { city:'北京', pos:[116.41,39.90],
+    intro:'公安部直属的全国公安系统最高学府，培养共和国忠诚卫士。',
+    food:'北京烤鸭', foodDesc:'果木挂炉烤制，皮酥肉嫩，卷饼蘸酱配葱丝黄瓜，是北京的美食名片。' },
+  '北京语言大学': { city:'北京', pos:[116.41,39.90],
+    intro:'教育部直属高校，素有“小联合国”之称，是来华留学生最多的大学之一，语言学科见长。',
+    food:'老北京炸酱面', foodDesc:'手擀面配干炸酱与丰富菜码，拌匀后咸香浓郁，是北京人的家常至味。' },
+  '北京理工大学': { city:'北京', pos:[116.41,39.90],
+    intro:'工信部直属的985工程全国重点大学，国防特色鲜明，兵器、车辆等工科实力雄厚。',
+    food:'铜锅涮肉', foodDesc:'炭火铜锅清汤，手切鲜羊肉蘸麻酱韭菜花，是北京冬日的仪式感。' },
+  '北京交通大学': { city:'北京', pos:[116.41,39.90],
+    intro:'教育部直属211工程重点大学，交通运输与信息学科优势突出，是轨道交通领域的重要学府。',
+    food:'驴打滚', foodDesc:'黄豆面裹豆沙的京味小吃，软糯香甜，因形似毛驴打滚而得名。' },
+  '天津商业大学': { city:'天津', pos:[117.20,39.08],
+    intro:'天津市属财经类高校，商科与管理特色鲜明，位于渤海之滨天津。',
+    food:'狗不理包子', foodDesc:'天津三绝之首，褶花匀称、皮薄馅大，是津门最负盛名的包子。' },
+  '河北工业大学': { city:'天津', pos:[117.20,39.08],
+    intro:'河北省属的211工程重点大学，虽名冠河北、校址却在天津，电气、机械等工科实力突出。',
+    food:'十八街麻花', foodDesc:'天津三绝之一，白条与麻条拧成，酥脆香甜、久放不绵。' },
+  '青岛科技大学': { city:'青岛', pos:[120.38,36.07],
+    intro:'以化工、材料为特色的省属重点大学，被誉为“中国橡胶工业的黄埔军校”。',
+    food:'辣炒蛤蜊', foodDesc:'青岛人的日常，鲜蛤蜊大火爆炒，配一扎青啤，是海边最惬意的夜晚。' },
+  '山东理工大学': { city:'淄博', pos:[118.05,36.81],
+    intro:'山东省属重点理工科大学，工科门类齐全，位于齐国故都淄博。',
+    food:'淄博烧烤', foodDesc:'小饼卷小葱配烤串，炭火小炉自己烤，是这几年火遍全国的“进淄赶烤”。' },
+  '南京农业大学': { city:'南京', pos:[118.80,32.06],
+    intro:'教育部直属211工程重点大学，农业与生命科学优势显著，坐落于六朝古都南京。',
+    food:'鸭血粉丝汤', foodDesc:'鸭血、鸭肠、粉丝与豆腐果，汤鲜料足，是南京人的味觉乡愁。' },
+  '江南大学': { city:'无锡', pos:[120.30,31.57],
+    intro:'教育部直属211工程重点大学，食品科学全国第一，设计学同样出色，位于太湖之滨无锡。',
+    food:'无锡酱排骨', foodDesc:'浓油赤酱、甜咸适口，肉质酥烂离骨，是无锡本帮菜的代表。' },
+  '安徽农业大学': { city:'合肥', pos:[117.23,31.82],
+    intro:'安徽省属重点大学，茶学、林学等学科特色鲜明，位于科教之城合肥。',
+    food:'肥西老母鸡汤', foodDesc:'选用散养老母鸡慢炖，汤清味鲜、滋补暖胃，是合肥人餐桌上的家常。' },
+  '温州大学': { city:'温州', pos:[120.70,28.00],
+    intro:'浙南地区综合性大学，商科、教育学等学科有区域影响力，位于民营经济重镇温州。',
+    food:'温州鱼丸', foodDesc:'鱼肉剁茸摔打上劲，汤清味鲜、弹嫩爽滑，是温州的市井味道。' },
+  '福建师范大学': { city:'福州', pos:[119.30,26.08],
+    intro:'福建省属重点综合性大学，师范与人文底蕴深厚，坐落于有福之州福州。',
+    food:'佛跳墙', foodDesc:'闽菜首席名菜，集山珍海味于一坛，汤汁浓醇、香气四溢，被誉为“闽菜之王”。' },
+  '火箭军工程大学': { city:'西安', pos:[108.94,34.34],
+    intro:'中国人民解放军火箭军工程大学，火箭军唯一的高等工程技术院校，培养战略导弹部队工程技术骨干，校址在古都西安。',
+    food:'羊肉泡馍', foodDesc:'把馍掰成黄豆粒大小，浇上滚烫羊汤，配糖蒜与辣酱，是西安人最惦记的一碗。' },
+  '西北大学': { city:'西安', pos:[108.94,34.34],
+    intro:'教育部与陕西省共建的综合性全国重点大学、双一流建设高校，地质、考古、经济学等学科见长，位于西安。',
+    food:'西安肉夹馍', foodDesc:'白吉馍夹上腊汁肉，馍酥肉香、肥而不腻，被誉为“中式汉堡”。' },
+  '西北农林科技大学': { city:'杨凌', pos:[108.08,34.29],
+    intro:'教育部直属双一流建设高校，农林水学科实力雄厚，坐落于中国农科城杨凌。',
+    food:'杨凌蘸水面', foodDesc:'杨凌特色面食，宽面一根入碗，蘸着酸辣蒜香的蘸汁吃，是“裤带面”的正宗吃法。' },
+  '空军工程大学': { city:'西安', pos:[108.94,34.34],
+    intro:'中国人民解放军空军工程大学，空军高层次工程技术人才的摇篮，本部位于西安。',
+    food:'Biangbiang面', foodDesc:'又宽又厚的裤带面，泼上热油辣子、蒜香四溢，是陕西面食的代表。' },
+  '西安建筑科技大学': { city:'西安', pos:[108.94,34.34],
+    intro:'以土木建筑、环境市政为特色的省部共建高校，建筑“老八校”之一，位于西安。',
+    food:'甑糕', foodDesc:'糯米与红枣层层叠蒸的西安传统甜食，软糯香甜，是清晨街头的一口甜。' }
+};
+
+const FOOD_OVERRIDE = {
+  '付子昂': { food:'十八街麻花', foodDesc:'天津三绝之一，白条与麻条拧成，酥脆香甜、久放不绵。' },
+  '李天扬': { food:'耳朵眼炸糕', foodDesc:'外皮酥脆、豆沙馅甜糯，是天津三绝之一。' },
+  '马诗涵': { food:'天津锅巴菜', foodDesc:'绿豆面摊成的嘎巴，浇上卤汁拌麻酱腐乳，是津味早餐的灵魂。' },
+  '秦钰穰': { food:'熟梨糕', foodDesc:'天津传统街头小吃，米面蒸糕上抹五色果酱，是童年的味道。' },
+  '于婧恩': { food:'罾蹦鲤鱼', foodDesc:'带鳞炸制的津味名菜，浇上酸甜汁，鳞酥肉嫩、造型生动。' },
+  '朱子豪': { food:'贴饽饽熬小鱼', foodDesc:'玉米面饽饽配熬炖小鱼，是天津卫朴实的家常味。' },
+  '丁凌寒旖': { food:'煎饼馃子', foodDesc:'绿豆面摊皮裹油条或馃箅儿，刷酱撒葱花，是天津最接地气的早餐。' }
+};
+
+const STUDENTS = [
+  ['范漪曼','石家庄铁道大学','河北省'],
+  ['耿尚文','河北科技大学','河北省'],
+  ['郭思绪','河北科技职业技术大学','河北省'],
+  ['何苏楠','河北大学','河北省'],
+  ['李思恬','河北中医药大学','河北省'],
+  ['张怡宁','河北经贸大学','河北省'],
+  ['朱政慈','河北农业大学','河北省'],
+  ['董曜宇','兰州大学','甘肃省'],
+  ['何晓梦','青海大学','青海省'],
+  ['李乐权','网络空间部队信息工程大学','河南省'],
+  ['赵梓成','重庆理工大学','重庆市'],
+  ['盖政硕','中南林业科技大学','湖南省'],
+  ['高楚奇','湘潭大学','湖南省'],
+  ['田至轩','湖南工业大学','湖南省'],
+  ['左鹏蒴','长沙理工大学','湖南省'],
+  ['边海琦','中山大学','广东省'],
+  ['王梓屹','广东外语外贸大学','广东省'],
+  ['张烁宇','黑龙江大学','黑龙江省'],
+  ['王相力','沈阳航空航天大学','辽宁省'],
+  ['李鑫','中国人民公安大学','北京市'],
+  ['孙皓阳','北京语言大学','北京市'],
+  ['张一帆','北京理工大学','北京市'],
+  ['张雨晨','北京交通大学','北京市'],
+  ['丁凌寒旖','天津商业大学','天津市'],
+  ['付子昂','河北工业大学','天津市'],
+  ['李天扬','河北工业大学','天津市'],
+  ['马诗涵','河北工业大学','天津市'],
+  ['秦钰穰','河北工业大学','天津市'],
+  ['宋雨薇','天津商业大学','天津市'],
+  ['于婧恩','河北工业大学','天津市'],
+  ['朱子豪','河北工业大学','天津市'],
+  ['郝庆铭','青岛科技大学','山东省'],
+  ['蔺自威','山东理工大学','山东省'],
+  ['程香凝','南京农业大学','江苏省'],
+  ['卢丹琦','江南大学','江苏省'],
+  ['陈梓睿','安徽农业大学','安徽省'],
+  ['曹润佳','温州大学','浙江省'],
+  ['乔翊寒','福建师范大学','福建省'],
+  ['梁雯钰','火箭军工程大学','陕西省'],
+  ['苏子悦','西北大学','陕西省'],
+  ['魏宇廷','西北农林科技大学','陕西省'],
+  ['杨烁','空军工程大学','陕西省'],
+  ['郑裕琮','西安建筑科技大学','陕西省']
+].map(function(a){
+  const u = UNIS[a[1]];
+  const ov = FOOD_OVERRIDE[a[0]] || {};
+  return {
+    name:a[0], uni:a[1], province:a[2],
+    city:u.city, pos:u.pos, intro:u.intro,
+    food: ov.food || u.food, foodDesc: ov.foodDesc || u.foodDesc
+  };
+});
+
+function norm(name){
+  return name.replace(/(壮族自治区|回族自治区|维吾尔自治区|特别行政区|自治区|省|市)$/,'');
+}
+
+const byProvince = {};
+STUDENTS.forEach(function(s){ (byProvince[s.province] = byProvince[s.province] || []).push(s); });
+const provinceShort = {};
+Object.keys(byProvince).forEach(function(p){ provinceShort[norm(p)] = p; });
+
+/* ================= 场景 ================= */
+const canvas = document.getElementById('scene');
+const wrap = document.getElementById('glwrap');
+let renderer, cssRenderer, scene, camera, controls;
+let mapRoot, markerGroup, provinceLabels = [], leaderGroup;
+let provinceGroups = {};   // normKey -> group
+let hoverProv = null, lastHoverProv = null;
+let focusedKey = null;
+let camAnim = null;
+const clock = new THREE.Clock();
+const glowTex = makeGlowTexture();
+let labelContainer;
+
+const H = 2.4;             // 省份立体厚度
+const LATK = 1.22;
+let S = 1, CENTER = { lng:104, lat:36 };
+let HOME = { target:new THREE.Vector3(0,0,0), pos:new THREE.Vector3(0,130,15) };
+
+function makeGlowTexture(){
+  const c = document.createElement('canvas'); c.width = c.height = 64;
+  const x = c.getContext('2d');
+  const g = x.createRadialGradient(32,32,0,32,32,32);
+  g.addColorStop(0,'rgba(255,255,255,1)');
+  g.addColorStop(0.22,'rgba(150,240,255,.85)');
+  g.addColorStop(0.55,'rgba(34,211,238,.28)');
+  g.addColorStop(1,'rgba(34,211,238,0)');
+  x.fillStyle = g; x.fillRect(0,0,64,64);
+  return new THREE.CanvasTexture(c);
+}
+
+function proj(lng, lat){
+  return new THREE.Vector3((lng - CENTER.lng) * S, 0, -(lat - CENTER.lat) * S * LATK);
+}
+
+async function loadGeoJSON(){
+  const urls = [
+    'https://geo.datav.aliyun.com/areas_v3/bound/100000_full.json',
+    'https://registry.npmmirror.com/echarts@4.9.0/files/map/json/china.json',
+    'https://cdn.jsdelivr.net/npm/echarts@4.9.0/map/json/china.json'
+  ];
+  let lastErr = null;
+  for (const u of urls){
+    try {
+      const r = await fetch(u);
+      if (!r.ok) throw new Error('HTTP ' + r.status);
+      return await r.json();
+    } catch(e){ lastErr = e; }
+  }
+  throw lastErr || new Error('geo load failed');
+}
+
+function walkCoords(coords, cb){
+  if (!coords) return;
+  if (typeof coords[0] === 'number'){
+    cb(coords[0], coords[1]);
+  } else {
+    for (let i=0;i<coords.length;i++) walkCoords(coords[i], cb);
+  }
+}
+
+function featureCenter(feature){
+  const p = feature.properties || {};
+  const c = p.center || p.centroid || p.cp;
+  if (Array.isArray(c) && c.length >= 2) return { lng:c[0], lat:c[1] };
+  let minLng=180,maxLng=-180,minLat=90,maxLat=-90, any=false;
+  walkCoords(feature.geometry.coordinates, function(lng,lat){
+    any = true;
+    if(lng<minLng)minLng=lng; if(lng>maxLng)maxLng=lng;
+    if(lat<minLat)minLat=lat; if(lat>maxLat)maxLat=lat;
+  });
+  if(!any) return { lng:CENTER.lng, lat:CENTER.lat };
+  return { lng:(minLng+maxLng)/2, lat:(minLat+maxLat)/2 };
+}
+
+function buildMap(fc){
+  // 计算包围盒
+  let minLng=180,maxLng=-180,minLat=90,maxLat=-90;
+  fc.features.forEach(function(f){
+    walkCoords(f.geometry.coordinates, function(lng,lat){
+      if(lng<minLng)minLng=lng; if(lng>maxLng)maxLng=lng;
+      if(lat<minLat)minLat=lat; if(lat>maxLat)maxLat=lat;
+    });
+  });
+  CENTER = { lng:(minLng+maxLng)/2, lat:(minLat+maxLat)/2 };
+  const TARGET_W = 100, TARGET_H = 74;
+  S = Math.min(TARGET_W/(maxLng-minLng), TARGET_H/((maxLat-minLat)*LATK));
+  HOME.target.set(0,0,0);
+  HOME.pos.set(0, 130, 15);
+
+  mapRoot = new THREE.Group();
+
+  fc.features.forEach(function(feature){
+    const key = norm(feature.properties.name);
+    const full = provinceShort[key];
+    const students = full ? byProvince[full] : [];
+    const has = students.length > 0;
+
+    const group = new THREE.Group();
+    group.userData = {
+      key: key, fullName: feature.properties.name,
+      students: students, hasStudents: has,
+      center: featureCenter(feature),
+      lift: 0, targetLift: 0,
+      materials: [], edges: [],
+      baseEmissive: has ? 0x0ea8b8 : 0x02040a,
+      baseEmissiveIntensity: has ? 0.55 : 1.0,
+      baseEdgeColor: has ? 0x1fd8e8 : 0x35517a,
+      baseEdgeOpacity: has ? 0.55 : 0.28
+    };
+
+    const mat = new THREE.MeshStandardMaterial(has ?
+      { color:0x123848, metalness:0.4, roughness:0.45, emissive:0x0ea8b8, emissiveIntensity:0.55 } :
+      { color:0x16233f, metalness:0.3, roughness:0.55, emissive:0x02040a, emissiveIntensity:1 });
+    const emat = new THREE.LineBasicMaterial(has ?
+      { color:0x1fd8e8, transparent:true, opacity:0.55 } :
+      { color:0x35517a, transparent:true, opacity:0.28 });
+    const polys = feature.geometry.type === 'MultiPolygon' ? feature.geometry.coordinates : [feature.geometry.coordinates];
+
+    polys.forEach(function(poly){
+      const shape = new THREE.Shape();
+      const outer = poly[0];
+      shape.moveTo((outer[0][0]-CENTER.lng)*S, (outer[0][1]-CENTER.lat)*S*LATK);
+      for (let i=1;i<outer.length;i++){
+        shape.lineTo((outer[i][0]-CENTER.lng)*S, (outer[i][1]-CENTER.lat)*S*LATK);
+      }
+      for (let h=1;h<poly.length;h++){
+        const hole = poly[h];
+        const path = new THREE.Path();
+        path.moveTo((hole[0][0]-CENTER.lng)*S, (hole[0][1]-CENTER.lat)*S*LATK);
+        for (let i=1;i<hole.length;i++){
+          path.lineTo((hole[i][0]-CENTER.lng)*S, (hole[i][1]-CENTER.lat)*S*LATK);
+        }
+        shape.holes.push(path);
+      }
+      const geo = new THREE.ExtrudeGeometry(shape, { depth:H, bevelEnabled:false });
+      geo.rotateX(-Math.PI/2);
+      const mesh = new THREE.Mesh(geo, mat);
+      mesh.userData.province = key;
+      group.add(mesh);
+      group.userData.materials.push(mat);
+
+      const edges = new THREE.LineSegments(new THREE.EdgesGeometry(geo, 12), emat);
+      edges.userData.province = key;
+      group.add(edges);
+      group.userData.edges.push(edges);
+    });
+
+    mapRoot.add(group);
+    provinceGroups[key] = group;
+  });
+
+  scene.add(mapRoot);
+  buildProvinceLabels();
+}
+
+/* ---- 省份名称 + 人数标签 ---- */
+const LABEL_OFFSET = {
+  '北京':[-1,-2.5], '天津':[3,2.5], '江苏':[2.5,0], '安徽':[-2.5,0],
+  '浙江':[2,1], '重庆':[-3,1.5], '上海':[3.5,0], '宁夏':[2.5,1],
+  '香港':[2.5,1.5], '澳门':[1.5,0], '海南':[2.5,1]
+};
+function roundRectPath(ctx, x, y, w, h, r){
+  r = Math.min(r, w/2, h/2);
+  ctx.beginPath();
+  ctx.moveTo(x+r, y);
+  ctx.arcTo(x+w, y, x+w, y+h, r);
+  ctx.arcTo(x+w, y+h, x, y+h, r);
+  ctx.arcTo(x, y+h, x, y, r);
+  ctx.arcTo(x, y, x+w, y, r);
+  ctx.closePath();
+}
+function makeLabel(name, count){
+  const has = count > 0;
+  const canvas = document.createElement('canvas');
+  const ctx = canvas.getContext('2d');
+  const nameFont = '700 ' + (has ? 20 : 16) + 'px "PingFang SC","Microsoft YaHei",sans-serif';
+  ctx.font = nameFont;
+  const nameW = Math.ceil(ctx.measureText(name).width);
+  let W, H;
+  if (has){
+    ctx.font = '700 12px "PingFang SC","Microsoft YaHei",sans-serif';
+    const cntW = Math.ceil(ctx.measureText(count + '人').width);
+    W = Math.max(nameW, cntW) + 16;
+    H = 48;
+  } else {
+    W = nameW + 14;
+    H = 26;
+  }
+  canvas.width = W; canvas.height = H;
+  const c = canvas.getContext('2d');
+  // 平贴在地图表面：极淡底衬，无浮块
+  roundRectPath(c, 1, 1, W-2, H-2, 7);
+  c.fillStyle = has ? 'rgba(6,12,24,0.5)' : 'rgba(6,12,24,0.38)';
+  c.fill();
+  c.textAlign = 'center';
+  c.textBaseline = 'middle';
+  if (has){
+    c.font = nameFont;
+    c.fillStyle = '#f4fbff';
+    c.fillText(name, W/2, 16);
+    c.font = '700 12px "PingFang SC","Microsoft YaHei",sans-serif';
+    c.fillStyle = '#22d3ee';
+    c.fillText(count + '人', W/2, 36);
+  } else {
+    c.font = nameFont;
+    c.fillStyle = '#a9c0dc';
+    c.fillText(name, W/2, H/2 + 1);
+  }
+  const tex = new THREE.CanvasTexture(canvas);
+  tex.minFilter = THREE.LinearFilter;
+  tex.magFilter = THREE.LinearFilter;
+  tex.generateMipmaps = false;
+  const hWorld = has ? 2.1 : 1.3;
+  const wWorld = hWorld * (W/H);
+  const geo = new THREE.PlaneGeometry(wWorld, hWorld);
+  geo.rotateX(-Math.PI / 2);
+  const mat = new THREE.MeshBasicMaterial({ map: tex, transparent: true, depthWrite: false, depthTest: false, side: THREE.DoubleSide });
+  const mesh = new THREE.Mesh(geo, mat);
+  mesh.renderOrder = 60;
+  mesh.userData.w = wWorld;
+  mesh.userData.h = hWorld;
+  return mesh;
+}
+function buildProvinceLabels(){
+  const items = [];
+  Object.keys(provinceGroups).forEach(function(key){
+    const g = provinceGroups[key];
+    const n = g.userData.students.length;
+    const lb = makeLabel(key, n);
+    const c = proj(g.userData.center.lng, g.userData.center.lat);
+    const off = LABEL_OFFSET[key] || [0,0];
+    lb.position.set(c.x + off[0], H + 0.05, c.z + off[1]);
+    lb.userData.province = key;
+    lb.userData.center = new THREE.Vector3(c.x, H + 0.05, c.z);
+    g.add(lb);
+    provinceLabels.push(lb);
+    items.push(lb);
+  });
+  spreadLabels(items);
+  addLeaderLines(items);
+}
+
+/* 防止标签堆叠：世界坐标下做简单的 2D 碰撞分离 */
+function spreadLabels(items){
+  const MARGIN = 1.7;
+  for (let iter = 0; iter < 50; iter++){
+    let moved = false;
+    for (let i = 0; i < items.length; i++){
+      for (let j = i + 1; j < items.length; j++){
+        const a = items[i], b = items[j];
+        const dx = b.position.x - a.position.x;
+        const dz = b.position.z - a.position.z;
+        const minDx = (a.userData.w + b.userData.w) / 2 + MARGIN;
+        const minDz = (a.userData.h + b.userData.h) / 2 + 1.1;
+        if (Math.abs(dx) < minDx && Math.abs(dz) < minDz){
+          const ox = minDx - Math.abs(dx);
+          const oz = minDz - Math.abs(dz);
+          if (ox < oz){
+            const sx = dx >= 0 ? 1 : -1;
+            a.position.x -= sx * ox / 2;
+            b.position.x += sx * ox / 2;
+          } else {
+            const sz = dz >= 0 ? 1 : -1;
+            a.position.z -= sz * oz / 2;
+            b.position.z += sz * oz / 2;
+          }
+          moved = true;
+        }
+      }
+    }
+    if (!moved) break;
+  }
+}
+
+/* 文件夹/标注线：把被拉开的标签用细线连回省份中心 */
+function makeLeader(a, b){
+  const geo = new THREE.BufferGeometry().setFromPoints([a, b]);
+  const mat = new THREE.LineBasicMaterial({ color:0x2fd3e6, transparent:true, opacity:0.6, depthWrite:false, depthTest:false });
+  const line = new THREE.Line(geo, mat);
+  line.renderOrder = 55;
+  return line;
+}
+function addLeaderLines(items){
+  if (leaderGroup) scene.remove(leaderGroup);
+  leaderGroup = new THREE.Group();
+  items.forEach(function(lb){
+    const c = lb.userData.center;
+    if (!c) return;
+    const dx = lb.position.x - c.x;
+    const dz = lb.position.z - c.z;
+    if (Math.hypot(dx, dz) < 2.2) return;
+    const a = new THREE.Vector3(c.x, H + 0.02, c.z);
+    const b = new THREE.Vector3(lb.position.x, H + 0.02, lb.position.z);
+    leaderGroup.add(makeLeader(a, b));
+  });
+  scene.add(leaderGroup);
+}
+
+function addLights(){
+  scene.add(new THREE.AmbientLight(0x2a3a55, 1.1));
+  const hemi = new THREE.HemisphereLight(0x9bd4ff, 0x0a1120, 0.75);
+  scene.add(hemi);
+  const dir = new THREE.DirectionalLight(0xffffff, 1.2);
+  dir.position.set(40, 90, 60);
+  scene.add(dir);
+  const p1 = new THREE.PointLight(0x22d3ee, 0.7, 160);
+  p1.position.set(-60, 40, 30);
+  scene.add(p1);
+  const p2 = new THREE.PointLight(0x8b5cf6, 0.5, 160);
+  p2.position.set(60, 30, -50);
+  scene.add(p2);
+}
+
+function addGround(){
+  const grid = new THREE.GridHelper(240, 60, 0x1a4a66, 0x0c2438);
+  grid.position.y = -0.4;
+  grid.material.transparent = true;
+  grid.material.opacity = 0.4;
+  scene.add(grid);
+
+  const glowMat = new THREE.SpriteMaterial({ map:glowTex, color:0x0f6b8a, transparent:true, opacity:.5, depthWrite:false, blending:THREE.AdditiveBlending });
+  const glow = new THREE.Sprite(glowMat);
+  glow.scale.set(180, 180, 1);
+  glow.position.y = -2;
+  scene.add(glow);
+}
+
+function initScene(){
+  scene = new THREE.Scene();
+  camera = new THREE.PerspectiveCamera(45, wrap.clientWidth/wrap.clientHeight, 0.1, 600);
+  camera.position.copy(HOME.pos);
+
+  renderer = new THREE.WebGLRenderer({ canvas:canvas, antialias:true, alpha:true });
+  renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+  renderer.setSize(wrap.clientWidth, wrap.clientHeight);
+  renderer.setClearColor(0x000000, 0);
+
+  controls = new OrbitControls(camera, renderer.domElement);
+  controls.target.copy(HOME.target);
+  controls.enableDamping = true;
+  controls.dampingFactor = 0.08;
+  controls.minDistance = 20;
+  controls.maxDistance = 180;
+  controls.minPolarAngle = 0;
+  controls.maxPolarAngle = Math.PI * 0.45;
+  controls.autoRotate = false;
+  controls.mouseButtons = {
+    LEFT: THREE.MOUSE.PAN,
+    MIDDLE: THREE.MOUSE.DOLLY,
+    RIGHT: THREE.MOUSE.ROTATE
+  };
+  controls.touches = {
+    ONE: THREE.TOUCH.PAN,
+    TWO: THREE.TOUCH.DOLLY_PAN
+  };
+
+  cssRenderer = new CSS2DRenderer();
+  cssRenderer.setSize(wrap.clientWidth, wrap.clientHeight);
+  cssRenderer.domElement.style.position = 'absolute';
+  cssRenderer.domElement.style.top = '0';
+  cssRenderer.domElement.style.left = '0';
+  cssRenderer.domElement.style.pointerEvents = 'none';
+  wrap.appendChild(cssRenderer.domElement);
+
+  markerGroup = new THREE.Group();
+  scene.add(markerGroup);
+
+  addLights();
+  addGround();
+  bindEvents();
+  animate();
+}
+
+/* ================= 交互 ================= */
+const raycaster = new THREE.Raycaster();
+const pointer = new THREE.Vector2();
+let downX=0, downY=0;
+
+function pickProvince(clientX, clientY){
+  const rect = renderer.domElement.getBoundingClientRect();
+  pointer.x = ((clientX-rect.left)/rect.width)*2 - 1;
+  pointer.y = -((clientY-rect.top)/rect.height)*2 + 1;
+  raycaster.setFromCamera(pointer, camera);
+  const meshes = [];
+  Object.keys(provinceGroups).forEach(function(k){ meshes.push.apply(meshes, provinceGroups[k].children); });
+  const hits = raycaster.intersectObjects(meshes, false);
+  for (const h of hits){
+    const key = h.object.userData.province;
+    if (key && provinceGroups[key]) return key;
+  }
+  return null;
+}
+
+function showTooltip(e, key){
+  const g = provinceGroups[key];
+  const t = document.getElementById('tooltip');
+  const cnt = g.userData.students.length;
+  t.innerHTML = '<b>' + g.userData.fullName + '</b> · ' + (cnt ? (cnt + ' 位同学') : '暂无同学');
+  t.style.display = 'block';
+  const w = t.offsetWidth, h = t.offsetHeight;
+  let x = e.clientX + 16, y = e.clientY + 16;
+  if (x + w > innerWidth - 8) x = e.clientX - w - 16;
+  if (y + h > innerHeight - 8) y = e.clientY - h - 16;
+  t.style.left = x + 'px'; t.style.top = y + 'px';
+}
+function hideTooltip(){ document.getElementById('tooltip').style.display = 'none'; }
+
+function bindEvents(){
+  renderer.domElement.addEventListener('pointermove', function(e){
+    const key = pickProvince(e.clientX, e.clientY);
+    if (key){
+      renderer.domElement.style.cursor = 'pointer';
+      showTooltip(e, key);
+    } else {
+      renderer.domElement.style.cursor = 'grab';
+      hideTooltip();
+    }
+    setHover(key);
+  });
+
+  renderer.domElement.addEventListener('pointerdown', function(e){ downX=e.clientX; downY=e.clientY; });
+  renderer.domElement.addEventListener('pointerup', function(e){
+    if (Math.hypot(e.clientX-downX, e.clientY-downY) > 6) return;
+    const key = pickProvince(e.clientX, e.clientY);
+    if (key) selectProvince(key);
+  });
+
+  renderer.domElement.addEventListener('pointerleave', function(){ setHover(null); hideTooltip(); });
+
+  addEventListener('resize', function(){
+    camera.aspect = wrap.clientWidth/wrap.clientHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(wrap.clientWidth, wrap.clientHeight);
+    cssRenderer.setSize(wrap.clientWidth, wrap.clientHeight);
+  });
+}
+
+function setHover(key){
+  if (key === (hoverProv && hoverProv.userData.key)) return;
+  if (hoverProv) lastHoverProv = hoverProv;
+  hoverProv = key ? provinceGroups[key] : null;
+
+  if (hoverProv){
+    const u = hoverProv.userData;
+    u.targetLift = 0.85;
+    u.materials.forEach(function(m){ m.emissive.set(0x9ff3ff); });
+    u.edges.forEach(function(e){ e.material.color.set(0x9ff3ff); e.material.opacity = 0.95; });
+  }
+  if (lastHoverProv && lastHoverProv !== hoverProv){
+    const u = lastHoverProv.userData;
+    u.targetLift = 0;
+    u.materials.forEach(function(m){ m.emissive.set(u.baseEmissive); });
+    u.edges.forEach(function(e){ e.material.color.set(u.baseEdgeColor); e.material.opacity = u.baseEdgeOpacity; });
+  }
+}
+
+function selectProvince(key){
+  const g = provinceGroups[key];
+  if (!g) return;
+  if (!g.userData.hasStudents){
+    toast(g.userData.fullName + ' 暂无同学在这里，换个发光的地方试试～');
+    pulse(key);
+    return;
+  }
+  focusProvince(key);
+}
+
+function pulse(key){
+  const g = provinceGroups[key];
+  g.userData.targetLift = 1.1;
+  setTimeout(function(){ if (!hoverProv || hoverProv !== g) g.userData.targetLift = 0; }, 350);
+}
+
+function toast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(t._t);
+  t._t = setTimeout(function(){ t.classList.remove('show'); }, 2200);
+}
+
+function focusProvince(key){
+  const g = provinceGroups[key];
+  focusedKey = key;
+  controls.autoRotate = false;
+
+  const c = proj(g.userData.center.lng, g.userData.center.lat);
+  const dir = new THREE.Vector3(0, 0.7071, 0.7071);
+  const dist = 38;
+  camAnim = {
+    fromTarget: controls.target.clone(), toTarget: c.clone(),
+    fromCam: camera.position.clone(), toCam: c.clone().add(dir.multiplyScalar(dist)),
+    t: 0, dur: 1300
+  };
+  controls.enabled = false;
+
+  document.body.classList.add('focused');
+  provinceLabels.forEach(function(l){ l.visible = false; });
+  if (leaderGroup) leaderGroup.visible = false;
+  openPanel(g);
+  buildMarkers(g);
+}
+
+function resetView(){
+  focusedKey = null;
+  document.body.classList.remove('focused');
+  provinceLabels.forEach(function(l){ l.visible = true; });
+  if (leaderGroup) leaderGroup.visible = true;
+  closePanel();
+  clearMarkers();
+  camAnim = {
+    fromTarget: controls.target.clone(), toTarget: HOME.target.clone(),
+    fromCam: camera.position.clone(), toCam: HOME.pos.clone(),
+    t: 0, dur: 1300
+  };
+  controls.enabled = false;
+}
+
+/* ================= 城市 / 美食插画 ================= */
+const CITY_EMOJI = {
+  '石家庄':'🏙️','保定':'🏯','邢台':'🏯','兰州':'🌉','西宁':'🏔️','郑州':'🏙️',
+  '重庆':'🌉','长沙':'🏙️','湘潭':'🏞️','株洲':'🏭','广州':'🌃','哈尔滨':'❄️',
+  '沈阳':'🏙️','北京':'🏯','天津':'🌉','青岛':'🌊','淄博':'🏺','南京':'🏯',
+  '无锡':'🌸','合肥':'🏙️','温州':'🌊','福州':'🌳',
+  '西安':'🏯','杨凌':'🌾'
+};
+const FOOD_EMOJI = {
+  '正定八大碗':'🍲','藁城宫面':'🍜','广宗薄饼':'🫓','保定驴肉火烧':'🥙','缸炉烧饼':'🫓',
+  '金毛狮子鱼':'🐟','漕河驴肉火烧':'🥙','兰州牛肉面':'🍜','青海酿皮':'🥗','郑州烩面':'🍜',
+  '重庆火锅':'🍲','长沙臭豆腐':'🧆','毛氏红烧肉':'🍖','攸县香干':'🍢','糖油粑粑':'🍡',
+  '广式早茶·虾饺':'🥟','广式烧鹅':'🦆','锅包肉':'🍖','沈阳鸡架':'🍗','北京烤鸭':'🦆',
+  '老北京炸酱面':'🍜','铜锅涮肉':'🍲','驴打滚':'🍡','狗不理包子':'🥟','十八街麻花':'🥨',
+  '耳朵眼炸糕':'🍘','天津锅巴菜':'🥘','熟梨糕':'🍥','罾蹦鲤鱼':'🐟','贴饽饽熬小鱼':'🐟',
+  '煎饼馃子':'🥞','辣炒蛤蜊':'🦪','淄博烧烤':'🍢','鸭血粉丝汤':'🍜','无锡酱排骨':'🍖',
+  '肥西老母鸡汤':'🍲','温州鱼丸':'🍥','佛跳墙':'🍲',
+  '羊肉泡馍':'🍲','西安肉夹馍':'🥙','杨凌蘸水面':'🍜','Biangbiang面':'🍜','甑糕':'🍡'
+};
+const GRADS = [
+  'linear-gradient(135deg,#0b3b5e 0%,#0d9488 100%)',
+  'linear-gradient(135deg,#312e81 0%,#8b5cf6 100%)',
+  'linear-gradient(135deg,#7c2d12 0%,#f59e0b 100%)',
+  'linear-gradient(135deg,#14532d 0%,#14b8a6 100%)',
+  'linear-gradient(135deg,#4a044e 0%,#db2777 100%)',
+  'linear-gradient(135deg,#1e3a8a 0%,#06b6d4 100%)'
+];
+/* 城市/美食实拍图：按城市拼音命名（缺失则用 emoji 兜底） */
+const CITY_IMG = {
+  '石家庄':'shijiazhuang','保定':'baoding','邢台':'xingtai','兰州':'lanzhou',
+  '西宁':'xining','郑州':'zhengzhou','重庆':'chongqing','长沙':'changsha',
+  '湘潭':'xiangtan','株洲':'zhuzhou','广州':'guangzhou','哈尔滨':'haerbin',
+  '沈阳':'shenyang','北京':'beijing','天津':'tianjing','青岛':'qingdao',
+  '淄博':'zibo','合肥':'hefei','温州':'wenzhou','福州':'fuzhou',
+  '西安':'xian','杨凌':'yangling'
+};
+const CITY_FOOD = {
+  '石家庄':'shijiazhuang','保定':'baoding','兰州':'lanzhou',
+  '西宁':'xining','郑州':'zhengzhou','重庆':'chongqing','长沙':'changsha',
+  '湘潭':'xiangtan','株洲':'zhuzhou','广州':'guangzhou','哈尔滨':'haerbin',
+  '沈阳':'shenyang','北京':'beijing','天津':'tianjing','青岛':'qingdao',
+  '淄博':'zibo','合肥':'hefei','温州':'wenzhou','福州':'fuzhou',
+  '西安':'xian'
+};
+const SKYLINE = '<rect x="0" y="52" width="30" height="38"/><rect x="34" y="40" width="24" height="50"/><rect x="62" y="58" width="34" height="32"/><rect x="100" y="30" width="20" height="60"/><rect x="124" y="50" width="40" height="40"/><rect x="168" y="36" width="24" height="54"/><rect x="196" y="58" width="34" height="32"/><rect x="234" y="42" width="22" height="48"/><rect x="260" y="56" width="38" height="34"/><rect x="302" y="34" width="20" height="56"/><rect x="326" y="48" width="32" height="42"/><rect x="362" y="60" width="38" height="30"/>';
+function ghash(s){ let h=0; for(let i=0;i<s.length;i++) h=(h*31+s.charCodeAt(i))>>>0; return h; }
+function fillIllustration(st){
+  const el = document.getElementById('mIll');
+  const ce = CITY_EMOJI[st.city] || '🏙️';
+  const fe = FOOD_EMOJI[st.food] || '🍜';
+  const cg = GRADS[ghash(st.city) % GRADS.length];
+  const fg = GRADS[ghash(st.food) % GRADS.length];
+  const cpy = CITY_IMG[st.city];
+  const fpy = CITY_FOOD[st.city];
+  const cityImg = cpy ? '<img class="ill-photo" alt="' + st.city + '" loading="lazy" src="images/' + cpy + '.jpg" onerror="this.style.display=\'none\'">' : '';
+  const foodImg = fpy ? '<img class="ill-photo" alt="' + st.food + '" loading="lazy" src="images/' + fpy + 'food.jpg" onerror="this.style.display=\'none\'">' : '';
+  el.innerHTML =
+    '<div class="ill"><div class="ill-bg" style="background:' + cg + '"><span class="ill-emoji">' + ce + '</span></div>' +
+    '<svg class="skyline" viewBox="0 0 400 90" preserveAspectRatio="none" fill="#06101f">' + SKYLINE + '</svg>' +
+    cityImg +
+    '<div class="ill-cap"><span class="tag">📍 城市</span><b>' + st.city + '</b></div></div>' +
+    '<div class="ill"><div class="ill-bg" style="background:' + fg + '"><span class="ill-emoji">' + fe + '</span></div>' +
+    foodImg +
+    '<div class="ill-cap"><span class="tag">🥢 当地美食</span><b>' + st.food + '</b></div></div>';
+}
+
+/* ================= 面板 & 弹窗 ================= */
+const panel = document.getElementById('panel');
+function openPanel(g){
+  const s = g.userData.students;
+  document.getElementById('pName').textContent = g.userData.fullName;
+  document.getElementById('pSub').textContent = s.length + ' 位同学 · 点击名字查看学校与美食';
+  const list = document.getElementById('pList');
+  list.innerHTML = '';
+  s.forEach(function(st){
+    const b = document.createElement('button');
+    b.className = 'stu';
+    b.innerHTML = '<span class="av">' + st.name[0] + '</span>' +
+      '<span><span class="nm">' + st.name + '</span><span class="uni">' + st.uni + '</span></span>' +
+      '<span class="go">›</span>';
+    b.onclick = function(){ openModal(st); };
+    list.appendChild(b);
+  });
+  panel.classList.add('show');
+}
+function closePanel(){ panel.classList.remove('show'); }
+
+function openModal(st){
+  document.getElementById('mAv').textContent = st.name[0];
+  document.getElementById('mName2').textContent = st.name;
+  document.getElementById('mUni').textContent = st.uni;
+  document.getElementById('mCity').textContent = st.province + ' · ' + st.city;
+  document.getElementById('mIntro').textContent = st.intro;
+  document.getElementById('mFood').textContent = st.food;
+  document.getElementById('mFoodDesc').textContent = st.foodDesc;
+  fillIllustration(st);
+  let hash = 0; const str = st.name + st.uni;
+  for (let i=0;i<str.length;i++) hash = (hash*31 + str.charCodeAt(i)) >>> 0;
+  const r = 3 + (hash % 3);
+  let stars = '';
+  for (let i=0;i<5;i++) stars += i < r ? '★' : '☆';
+  document.getElementById('mStars').textContent = stars;
+  document.getElementById('modal').classList.add('show');
+}
+function closeModal(){ document.getElementById('modal').classList.remove('show'); }
+document.getElementById('mClose').onclick = closeModal;
+document.getElementById('modal').addEventListener('click', function(e){ if (e.target === this) closeModal(); });
+document.getElementById('backBtn').onclick = resetView;
+document.getElementById('homeBtn').onclick = function(){ resetView(); window.scrollTo({top:0, behavior:'smooth'}); };
+document.getElementById('msgNavBtn').onclick = function(){ document.getElementById('messages').scrollIntoView({behavior:'smooth'}); };
+
+/* ================= 标记 ================= */
+function clearMarkers(){
+  while (markerGroup.children.length) markerGroup.remove(markerGroup.children[0]);
+}
+
+function buildMarkers(g){
+  clearMarkers();
+  const s = g.userData.students;
+  const byCity = {};
+  s.forEach(function(st){ (byCity[st.city] = byCity[st.city] || []).push(st); });
+
+  Object.keys(byCity).forEach(function(city){
+    const arr = byCity[city];
+    const p = proj(arr[0].pos[0], arr[0].pos[1]);
+    p.y = H + 0.6;
+
+    const dot = new THREE.Sprite(new THREE.SpriteMaterial({ map:glowTex, color:0x9ff4ff, transparent:true, depthWrite:false, depthTest:false, blending:THREE.AdditiveBlending }));
+    dot.scale.set(1.5, 1.5, 1);
+    dot.position.copy(p);
+    dot.renderOrder = 70;
+    dot.userData.pulse = Math.random()*Math.PI*2;
+    markerGroup.add(dot);
+  });
+}
+
+function updateMarkers(dt){
+  const t = performance.now()/1000;
+  markerGroup.children.forEach(function(o){
+    if (o.userData && o.userData.pulse !== undefined){
+      const sc = 1.5 + Math.sin(t*4 + o.userData.pulse)*0.5;
+      o.scale.set(sc, sc, 1);
+    }
+  });
+}
+
+/* ================= 动画 ================= */
+function easeInOutCubic(k){ return k < 0.5 ? 4*k*k*k : 1 - Math.pow(-2*k+2,3)/2; }
+
+function updateCamAnim(){
+  if (!camAnim) return;
+  camAnim.t += 16;
+  const k = Math.min(1, camAnim.t/camAnim.dur);
+  const e = easeInOutCubic(k);
+  controls.target.lerpVectors(camAnim.fromTarget, camAnim.toTarget, e);
+  camera.position.lerpVectors(camAnim.fromCam, camAnim.toCam, e);
+  if (k >= 1){ camAnim = null; controls.enabled = true; }
+}
+
+function updateLift(dt){
+  const k = Math.min(1, dt*8);
+  [hoverProv, lastHoverProv].forEach(function(g){
+    if (!g) return;
+    g.userData.lift += (g.userData.targetLift - g.userData.lift) * k;
+    g.position.y = g.userData.lift;
+    const cur = g.userData.materials[0];
+    if (cur){
+      const targetI = g.userData.targetLift > 0 ? 1.2 : g.userData.baseEmissiveIntensity;
+      g.userData.materials.forEach(function(m){ m.emissiveIntensity += (targetI - m.emissiveIntensity) * k; });
+    }
+  });
+}
+
+function animate(){
+  requestAnimationFrame(animate);
+  const dt = Math.min(clock.getDelta(), 0.05);
+  updateCamAnim();
+  updateLift(dt);
+  controls.update();
+  updateMarkers(dt);
+  renderer.render(scene, camera);
+  cssRenderer.render(scene, camera);
+}
+
+/* ================= 寄语墙 ================= */
+const MSG_KEY = 'a10_cengfan_messages_v1';
+const SEED = [];
+
+function saveMsgs(){
+  try { localStorage.setItem(MSG_KEY, JSON.stringify(msgs)); } catch(e){}
+}
+function loadMsgs(){
+  try {
+    const raw = localStorage.getItem(MSG_KEY);
+    if (raw) return JSON.parse(raw);
+  } catch(e){}
+  return SEED.slice();
+}
+let msgs = loadMsgs();
+
+function renderWall(){
+  const wall = document.getElementById('msgWall');
+  wall.innerHTML = '';
+  if (!msgs.length){
+    const empty = document.createElement('div');
+    empty.className = 'msg-empty';
+    empty.textContent = '还没有寄语，快来写下第一条吧 ✍️';
+    wall.appendChild(empty);
+    return;
+  }
+  msgs.forEach(function(m, idx){
+    const c = document.createElement('div');
+    c.className = 'msg-card';
+    const when = new Date(m.t);
+    const ds = when.getMonth()+1 + '月' + when.getDate() + '日 ' + String(when.getHours()).padStart(2,'0') + ':' + String(when.getMinutes()).padStart(2,'0');
+    c.innerHTML =
+      '<button class="del" title="删除">✕</button>' +
+      '<div class="head"><div class="av">' + (m.name||'匿')[0] + '</div>' +
+      '<div><div class="who">' + (m.name||'匿名同学') + '</div><div class="when">' + ds + '</div></div></div>' +
+      '<div class="txt">' + escapeHtml(m.text) + '</div>';
+    c.querySelector('.del').onclick = function(){
+      msgs.splice(idx,1);
+      saveMsgs();
+      renderWall();
+    };
+    wall.appendChild(c);
+  });
+}
+
+function escapeHtml(s){
+  return String(s).replace(/[&<>"']/g, function(ch){
+    return { '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[ch];
+  });
+}
+
+document.getElementById('mSubmit').onclick = function(){
+  const name = document.getElementById('mName').value.trim();
+  const text = document.getElementById('mText').value.trim();
+  if (!text){ toast('写点内容再发布吧～'); return; }
+  msgs.unshift({ name: name || '匿名同学', text: text, t: Date.now() });
+  if (msgs.length > 200) msgs.length = 200;
+  saveMsgs();
+  document.getElementById('mName').value = '';
+  document.getElementById('mText').value = '';
+  renderWall();
+  toast('寄语已发布，墙上有你啦 ✨');
+};
+
+/* 姓名联想 */
+(function(){
+  const dl = document.getElementById('nameList');
+  STUDENTS.forEach(function(s){
+    const o = document.createElement('option');
+    o.value = s.name; dl.appendChild(o);
+  });
+})();
+renderWall();
+
+/* ================= 启动 ================= */
+async function start(){
+  try {
+    const fc = await loadGeoJSON();
+    initScene();
+    buildMap(fc);
+    const load = document.getElementById('loading');
+    load.classList.add('hide');
+    setTimeout(function(){ load.remove(); }, 700);
+  } catch(err){
+    console.error(err);
+    const load = document.getElementById('loading');
+    load.innerHTML = '<div class="load-box"><div class="t">加载失败</div><div class="s">地图数据/3D库加载失败，请检查网络后刷新重试</div></div>';
+  }
+}
+start();
+</script>
+</body>
+</html>
