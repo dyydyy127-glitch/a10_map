@@ -245,6 +245,7 @@ body.focused header{filter:blur(10px); opacity:.55}
 
 .msg-wall{display:grid; grid-template-columns:repeat(auto-fill,minmax(270px,1fr)); gap:16px; align-content:start}
 .msg-empty{grid-column:1/-1; text-align:center; padding:56px 20px; border:1px dashed var(--line); border-radius:18px; color:var(--muted); font-size:14px; letter-spacing:1px}
+.giscus-wrap{max-width:860px; margin:0 auto; border:1px solid var(--line); border-radius:18px; overflow:hidden; background:rgba(9,15,30,.5); backdrop-filter:blur(8px); padding:4px}
 .msg-card{
   position:relative; padding:18px 18px 16px; border-radius:18px;
   background:rgba(13,22,42,.55); border:1px solid var(--line); backdrop-filter:blur(10px);
@@ -402,20 +403,26 @@ body.focused header{filter:blur(10px); opacity:.55}
   <div class="sec-head">
     <div class="en">— MESSAGE WALL —</div>
     <h2>同学寄语墙</h2>
-    <p>把想对大家说的话留在这里，愿我们各自奔赴山海，顶峰相见</p>
+    <p>用 GitHub 账号登录留言，所有人的寄语都会同步显示在这里</p>
   </div>
-  <div class="msg-wrap">
-    <div class="msg-form">
-      <h3>✍️ 写下你的寄语</h3>
-      <label>你的名字</label>
-      <input id="mName" list="nameList" placeholder="例如：范漪曼" maxlength="20" />
-      <datalist id="nameList"></datalist>
-      <label>寄语内容</label>
-      <textarea id="mText" placeholder="祝大家前程似锦，常回来蹭饭！" maxlength="240"></textarea>
-      <button class="submit" id="mSubmit">发布寄语</button>
-      <p style="font-size:11px;color:var(--muted);margin-top:12px;line-height:1.7">寄语保存在本机浏览器（localStorage），刷新不会丢失。</p>
+  <div class="msg-wrap" style="grid-template-columns:1fr">
+    <div class="giscus-wrap">
+      <script src="https://giscus.app/client.js"
+        data-repo="dyydyy127-glitch/a10_map"
+        data-repo-id="R_kgDOT8rpaw"
+        data-category="General"
+        data-category-id="DIC_kwDOT8rpa84DDsOY"
+        data-mapping="pathname"
+        data-strict="0"
+        data-reactions-enabled="1"
+        data-emit-metadata="0"
+        data-input-position="top"
+        data-theme="dark"
+        data-lang="zh-CN"
+        crossorigin="anonymous"
+        async>
+      </script>
     </div>
-    <div class="msg-wall" id="msgWall"></div>
   </div>
 </div>
 
@@ -646,6 +653,7 @@ const FOOD_OVERRIDE = {
 
 const STUDENTS = [
   ['范漪曼','石家庄铁道大学','河北省'],
+  ['苏政宇','石家庄铁道大学','河北省'],
   ['耿尚文','河北科技大学','河北省'],
   ['郭思绪','河北科技职业技术大学','河北省'],
   ['何苏楠','河北大学','河北省'],
@@ -1409,80 +1417,6 @@ function animate(){
   renderer.render(scene, camera);
   cssRenderer.render(scene, camera);
 }
-
-/* ================= 寄语墙 ================= */
-const MSG_KEY = 'a10_cengfan_messages_v1';
-const SEED = [];
-
-function saveMsgs(){
-  try { localStorage.setItem(MSG_KEY, JSON.stringify(msgs)); } catch(e){}
-}
-function loadMsgs(){
-  try {
-    const raw = localStorage.getItem(MSG_KEY);
-    if (raw) return JSON.parse(raw);
-  } catch(e){}
-  return SEED.slice();
-}
-let msgs = loadMsgs();
-
-function renderWall(){
-  const wall = document.getElementById('msgWall');
-  wall.innerHTML = '';
-  if (!msgs.length){
-    const empty = document.createElement('div');
-    empty.className = 'msg-empty';
-    empty.textContent = '还没有寄语，快来写下第一条吧 ✍️';
-    wall.appendChild(empty);
-    return;
-  }
-  msgs.forEach(function(m, idx){
-    const c = document.createElement('div');
-    c.className = 'msg-card';
-    const when = new Date(m.t);
-    const ds = when.getMonth()+1 + '月' + when.getDate() + '日 ' + String(when.getHours()).padStart(2,'0') + ':' + String(when.getMinutes()).padStart(2,'0');
-    c.innerHTML =
-      '<button class="del" title="删除">✕</button>' +
-      '<div class="head"><div class="av">' + (m.name||'匿')[0] + '</div>' +
-      '<div><div class="who">' + (m.name||'匿名同学') + '</div><div class="when">' + ds + '</div></div></div>' +
-      '<div class="txt">' + escapeHtml(m.text) + '</div>';
-    c.querySelector('.del').onclick = function(){
-      msgs.splice(idx,1);
-      saveMsgs();
-      renderWall();
-    };
-    wall.appendChild(c);
-  });
-}
-
-function escapeHtml(s){
-  return String(s).replace(/[&<>"']/g, function(ch){
-    return { '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[ch];
-  });
-}
-
-document.getElementById('mSubmit').onclick = function(){
-  const name = document.getElementById('mName').value.trim();
-  const text = document.getElementById('mText').value.trim();
-  if (!text){ toast('写点内容再发布吧～'); return; }
-  msgs.unshift({ name: name || '匿名同学', text: text, t: Date.now() });
-  if (msgs.length > 200) msgs.length = 200;
-  saveMsgs();
-  document.getElementById('mName').value = '';
-  document.getElementById('mText').value = '';
-  renderWall();
-  toast('寄语已发布，墙上有你啦 ✨');
-};
-
-/* 姓名联想 */
-(function(){
-  const dl = document.getElementById('nameList');
-  STUDENTS.forEach(function(s){
-    const o = document.createElement('option');
-    o.value = s.name; dl.appendChild(o);
-  });
-})();
-renderWall();
 
 /* ================= 启动 ================= */
 async function start(){
