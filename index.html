@@ -495,8 +495,8 @@ body.focused header{filter:blur(10px); opacity:.55}
 <script type="importmap">
 {
   "imports": {
-    "three": "https://registry.npmmirror.com/three/0.160.0/files/build/three.module.js",
-    "three/addons/": "https://registry.npmmirror.com/three/0.160.0/files/examples/jsm/"
+    "three": "./vendor/three.module.js",
+    "three/addons/": "./vendor/addons/"
   }
 }
 </script>
@@ -730,6 +730,7 @@ function proj(lng, lat){
 
 async function loadGeoJSON(){
   const urls = [
+    './china.json',
     'https://geo.datav.aliyun.com/areas_v3/bound/100000_full.json',
     'https://registry.npmmirror.com/echarts@4.9.0/files/map/json/china.json',
     'https://cdn.jsdelivr.net/npm/echarts@4.9.0/map/json/china.json'
